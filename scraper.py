@@ -4,6 +4,9 @@
 from bs4 import BeautifulSoup
 import json
 import csv
+import pandas as pd
+from datetime import datetime
+
 
 def extraire_donnees(fichier_nouv_cellier, parser):
 
@@ -49,15 +52,16 @@ def extraire_info(resultat_info):
     #prix = resultat_prix.find('td', attrs={'class': 'price'}).text.strip()
 
     # construction du dictionaire
-    info_produit = {titre: {'appelation': appelation,
-                            'cépage': cepage,
-                            'identité': identite,
-                            'pays': pays,
-                            'région': region,
-                            'volume': volume,
-                            #'prix': prix,
-                            'code SAQ': code_saq,
-                            'URL': url}}
+    info_produit = {'titre': titre,
+                    'appelation': appelation,
+                    'cépage': cepage,
+                    'identité': identite,
+                    'pays': pays,
+                    'région': region,
+                    'volume': volume,
+                    #'prix': prix,
+                    'code SAQ': code_saq,
+                    'URL': url}
 
     # construction de la ligne CSV
     info_produit_csv = [titre, appelation, cepage, identite, pays, region, volume, code_saq, url]
@@ -65,10 +69,22 @@ def extraire_info(resultat_info):
     return(info_produit, info_produit_csv)
 
 
+def faire_html(ajd):
+
+    # lire le fichier CSV, le convertir en data frame puis l'écrire en HTML
+    with open('sortie.csv', 'r') as fichier_csv:
+        df = pd.read_csv(fichier_csv)
+
+    with open('sortie.html', 'w') as fichier_html:
+        fichier_html.write('Données récoltées le {}'.format(ajd))
+        fichier_html.write(df.to_html())
+
+
 def main():
 
     parser = 'html.parser'
     fichier_nouv_cellier = 'nouvel-arrivage-cellier.html'
+    ajd = datetime.now().strftime("%Y-%m-%d")
 
     soupe = extraire_donnees(fichier_nouv_cellier, parser)
     soupe_resultats_info, soupe_resultats_prix = trouver_resultats(soupe)
@@ -88,6 +104,9 @@ def main():
             csvwriter = csv.writer(fichier_csv)
             csvwriter.writerow(info_produit_csv)
 
+    # créer fichier HTML à partir du CSV
+    faire_html(ajd)
+    
 
 if __name__ == '__main__':
     main()
