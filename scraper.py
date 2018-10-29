@@ -26,7 +26,7 @@ def trouver_resultats(soupe):
     return(soupe_resultats_info, soupe_resultats_prix)
 
 
-def extraire_info(resultat_info):
+def extraire_info(resultat_info, info_produit):
 
     # extraction des résultats en utilisant BeautifulSoup
     titre = resultat_info.find('div', attrs={'class': 'mev-product-title '}).find('a')['title'].replace('\xa0',' ')
@@ -52,7 +52,7 @@ def extraire_info(resultat_info):
     #prix = resultat_prix.find('td', attrs={'class': 'price'}).text.strip()
 
     # construction du dictionaire
-    info_produit = {'titre': titre,
+    dict_produit = {titre: {
                     'appelation': appelation,
                     'cépage': cepage,
                     'identité': identite,
@@ -61,7 +61,8 @@ def extraire_info(resultat_info):
                     'volume': volume,
                     #'prix': prix,
                     'code SAQ': code_saq,
-                    'URL': url}
+                    'URL': url}}
+    info_produit.append(dict_produit)
 
     # construction de la ligne CSV
     info_produit_csv = [titre, appelation, cepage, identite, pays, region, volume, code_saq, url]
@@ -76,7 +77,7 @@ def faire_html(ajd):
         df = pd.read_csv(fichier_csv)
 
     with open('sortie.html', 'w') as fichier_html:
-        fichier_html.write('Données récoltées le {}'.format(ajd))
+        fichier_html.write('Nouveautés produits Cellier SAQ. Données récoltées le {}.'.format(ajd))
         fichier_html.write(df.to_html())
 
 
@@ -94,19 +95,19 @@ def main():
         fichier_csv.write('titre,appelation,cépage,identité,pays,région,volume,code SAQ,url\n')
 
     # créer les fichiers JSON et CSV
+    info_produit = []
     for resultat_info in soupe_resultats_info:
-        info_produit, info_produit_csv = extraire_info(resultat_info)
-
-        with open('sortie.json', 'a') as fichier_json:
-            fichier_json.write(json.dumps(info_produit, indent = 4)+ '\n')
-
+        info_produit, info_produit_csv = extraire_info(resultat_info, info_produit)
         with open('sortie.csv', 'a') as fichier_csv:
             csvwriter = csv.writer(fichier_csv)
             csvwriter.writerow(info_produit_csv)
 
+    with open('sortie.json', 'a') as fichier_json:
+        fichier_json.write(json.dumps(info_produit, indent = 4)+ '\n')
+
     # créer fichier HTML à partir du CSV
     faire_html(ajd)
-    
+
 
 if __name__ == '__main__':
     main()
