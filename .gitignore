@@ -1,2 +1,3 @@
-sortie.*
-scraper3.py
+wrapper.py
+__pycache__
+sortie*

@@ -1,4 +1,4 @@
-#!/bin/usr/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 from bs4 import BeautifulSoup
@@ -75,6 +75,7 @@ def faire_html(ajd):
     # lire le fichier CSV, le convertir en data frame puis l'écrire en HTML
     with open('sortie.csv', 'r') as fichier_csv:
         df = pd.read_csv(fichier_csv)
+        #print(df)
 
     with open('sortie.html', 'w') as fichier_html:
         fichier_html.write('Nouveautés produits Cellier SAQ. Données récoltées le {}.'.format(ajd))
