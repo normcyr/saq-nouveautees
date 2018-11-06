@@ -75,6 +75,7 @@ def faire_html(ajd):
     # lire le fichier CSV, le convertir en data frame puis l'écrire en HTML
     with open('sortie.csv', 'r') as fichier_csv:
         df = pd.read_csv(fichier_csv)
+        df = df.sort_values('pays')
         #print(df)
 
     with open('sortie.html', 'w') as fichier_html:
